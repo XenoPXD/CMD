@@ -1,8 +1,13 @@
 package impl;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.text.BadLocationException;
 
@@ -22,6 +27,8 @@ public class Purge {
 	public static String PATH_PURGE = "";
 	private static List<Action> listeActions = new ArrayList<Action>();
 	protected static Options options = null;
+	protected static long startTime = System.currentTimeMillis();
+	public static DateFormat dateFormat = DateFormat.getDateTimeInstance();//("HH':'mm':'ss'.'SSS");
 	
 	private static Options configParameters() {
 
@@ -99,6 +106,7 @@ public class Purge {
 	
 	public static void main(String[] args) throws BadLocationException, Exception {
 		
+		
 		System.out.println("");
 		
 		options = configParameters();
@@ -142,13 +150,15 @@ public class Purge {
 			
 			if (PurgeGest.nbrFile>0) {
 				System.out.println("");
-				System.out.println("Taille total de " + Action.convertTailleToString(PurgeGest.tailleGlobale)+".");
+				System.out.println("Taille total " + Action.convertTailleToString(PurgeGest.tailleGlobale));
 			} else {
 				System.out.println("Aucun fichier trouvé.");
 			}
 			
 		} catch (ParseException e) {
 			help();
+		} finally {
+		    System.out.println("Temps d'exécution " + getTimeString(System.currentTimeMillis()-startTime));
 		}
 	}
 
@@ -169,4 +179,11 @@ public class Purge {
 		System.exit(0);
 	}
 	 
+	private static String getTimeString(final long millis) {
+		String hms = String.format("%02d:%02d:%02d.%03d", TimeUnit.MILLISECONDS.toHours(millis),
+			    TimeUnit.MILLISECONDS.toMinutes(millis) % TimeUnit.HOURS.toMinutes(1),
+			    TimeUnit.MILLISECONDS.toSeconds(millis) % TimeUnit.MINUTES.toSeconds(1),
+			    TimeUnit.MILLISECONDS.toMillis(millis) % TimeUnit.SECONDS.toMillis(1));
+		return hms;
+	}
 }
