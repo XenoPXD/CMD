@@ -51,6 +51,14 @@ public class Purge {
 	            .required(false) 
 	            .build();
 
+	    final Option delOption = Option.builder("d") 
+	            .longOpt("del")
+	            .desc("Del") 
+	            .hasArg(false) 
+	            .argName("del")
+	            .required(false) 
+	            .build();
+	    
 	    final Option clearOption = Option.builder("c") 
 	            .longOpt("clear")
 	            .desc("Clear") 
@@ -67,6 +75,14 @@ public class Purge {
 	            .required(false) 
 	            .build();
 	    
+	    final Option verboseOption = Option.builder("v") 
+	            .longOpt("verbose")
+	            .desc("Verbose") 
+	            .hasArg(false) 
+	            .argName("verbose")
+	            .required(false) 
+	            .build();
+	    
 	    final Options options = new Options();
 
 	    options.addOption(helpOption);
@@ -74,16 +90,14 @@ public class Purge {
 	    options.addOption(pathOption);
 	    options.addOption(fileOption);
 	    options.addOption(clearOption);
+	    options.addOption(delOption);
+	    options.addOption(verboseOption);
 
 	    return options;
 	}
 	
 	
 	public static void main(String[] args) throws BadLocationException, Exception {
-		
-//		for (int i = 0; i < args.length; i++) {
-//			System.out.println(args[i]);
-//		}
 		
 		System.out.println("");
 		
@@ -98,13 +112,9 @@ public class Purge {
 				help();
 			}
 			
-	        PATH_PURGE = new File(
-					Purge.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
-							.getParent();
-			//System.out.println("PATH_PURGE : " + PATH_PURGE);
-			//JdomGest.load(PATH_PURGE + "\\purge.xml");
-			
 			Action action = new Action();
+			
+			action.setVerbose(line.hasOption("v"));
 			
 			if (line.hasOption("p")) {
 				action.setPath(line.getOptionValue("p"));
@@ -119,8 +129,12 @@ public class Purge {
 			}
 			
 			action.setSub(line.hasOption("s"));
-			
+			action.setDel(line.hasOption("d"));
 			action.setClear(line.hasOption("c"));
+			
+			if (action.isVerbose()) {
+				printArgs(args);
+			}
 			
 			File pathfile = new File(action.getPath());
 			PurgeGest.nbrFile=0;
@@ -128,20 +142,24 @@ public class Purge {
 			
 			if (PurgeGest.nbrFile>0) {
 				System.out.println("");
-				System.out.println("Purge total de " + Action.convertTailleToString(PurgeGest.tailleGlobale)+".");
+				System.out.println("Taille total de " + Action.convertTailleToString(PurgeGest.tailleGlobale)+".");
 			} else {
 				System.out.println("Aucun fichier trouvé.");
 			}
 			
-	//		System.out.println("---------------------------------------------------");
-	//		System.out.println("-path " + action.getPath());
-	//		System.out.println("-file " + action.getFile());
-	//		System.out.println("-sub " + action.isSub());
-	//		System.out.println("-clear " + action.isClear());
-			
 		} catch (ParseException e) {
 			help();
 		}
+	}
+
+
+	private static void printArgs(String[] args) {
+		System.out.print("Purge");
+		for (int i = 0; i < args.length; i++) {
+			System.out.print(" "+args[i]);
+		}
+		System.out.println();
+		System.out.println();
 	}
 
 	private static void help() {
