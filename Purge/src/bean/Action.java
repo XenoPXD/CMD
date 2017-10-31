@@ -10,7 +10,9 @@ public class Action {
 	private String file;
 	private boolean sub;
 	private boolean clear;
+	private boolean del;
 	private Pattern pattern;
+	private boolean verbose;
 	
 	private final static NumberFormat formatter = new DecimalFormat("#0.00");  
 	
@@ -29,11 +31,24 @@ public class Action {
 		this.pattern = Pattern.compile("^"+strPattern+"$");
 	}
 	
+	
+	public boolean isVerbose() {
+		return verbose;
+	}
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
+	}
 	public boolean isSub() {
 		return sub;
 	}
 	public void setSub(boolean sub) {
 		this.sub = sub;
+	}
+	public boolean isDel() {
+		return del;
+	}
+	public void setDel(boolean del) {
+		this.del = del;
 	}
 	public boolean isClear() {
 		return clear;
