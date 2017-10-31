@@ -19,7 +19,7 @@ public class PurgeGest {
 	
 	public static long tailleGlobale = 0;
 	public static int nbrFile = 0;
-	public static DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm"); // new SimpleDateFormat("dd-MM-yy HH:mm:ss");
+	public static DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	
 	public static void supprimerFichiers(File inFile, final Action action) throws BadLocationException, Exception {
 		if (inFile.exists()) {
@@ -30,7 +30,7 @@ public class PurgeGest {
 					if (matcher.find(0)) {
 						deleteDirectory(file, action);
 					}
-					if (action.isSub()/*inSousRep*/) {
+					if (action.isSub()) {
 						supprimerFichiers(file, action);
 					}
 				} else {
@@ -52,38 +52,49 @@ public class PurgeGest {
 				updateOrDelete(action, fils);
 			}
 		}
-		System.out.println(getTailleString(racine) + "Suppression du répertoire " + racine.getAbsolutePath());
-		racine.delete();
+		if (action.isDel()) {
+			System.out.println(getTailleString(racine.length()) + "Suppression du répertoire " + racine.getAbsolutePath());
+			long taille = racine.length();
+			racine.delete();
+			tailleGlobale += taille;
+		} else {
+			System.out.println(getTailleString(racine.length()) + "Répertoire " + racine.getAbsolutePath());
+		}
 	}
 	
 	private static void updateOrDelete(final Action action, File file) {
-		
-		if (!action.isClear()) {
-			long taille = file.length();
-//			long inTaille =+ taille;
-			System.out.println(getTailleString(file) + "Suppression du fichier " + file.getAbsolutePath());
+		long taille = file.length();
+		if (action.isDel()) {
+			System.out.println(getTailleString(file.length()) + "Suppression du fichier " + file.getAbsolutePath());
 			file.delete();
 			nbrFile++;
-		} else if ( true/* FILE.equals(action.getClear()) */ /* inAction.getClearFichier() */) {
-			System.out.println(getTailleString(file) + "Nettoyage du fichier " + file.getAbsolutePath());
+			tailleGlobale += taille;
+		} else if (action.isClear()) {
+			System.out.println(getTailleString(file.length()) + "Nettoyage du fichier " + file.getAbsolutePath());
 				FileOutputStream fos;
 				try {
 					fos = new FileOutputStream( file );
 					fos.close( );
+					nbrFile++;
+					tailleGlobale += taille;
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					//e.printStackTrace();
+					System.out.println(e);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+//					e.printStackTrace();
+					System.out.println(e);
 				}
 				nbrFile++;
+		} else {
+			nbrFile++;
+			System.out.println(getTailleString(file.length()) + "Fichier " + file.getAbsolutePath());
+			tailleGlobale += taille;
 		}
 	}
 
-	private static String getTailleString(File file) {
-		long taille = file.length();
-		tailleGlobale += taille;
+	private static String getTailleString(long taille) {
 		String strTaille = String.format("%10s", Action.convertTailleToString(taille)) + " " ;
 		return strTaille;
 	}
