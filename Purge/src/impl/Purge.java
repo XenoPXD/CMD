@@ -3,13 +3,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.text.BadLocationException;
@@ -27,12 +20,8 @@ import gest.PurgeGest;
 
 public class Purge {
 
-	public static String PATH_PURGE = "";
-	private static List<Action> listeActions = new ArrayList<Action>();
-	protected static Options options = null;
-	protected static long startTime = System.currentTimeMillis();
-	public static DateFormat dateFormat = DateFormat.getDateTimeInstance();//("HH':'mm':'ss'.'SSS");
-//	private static final CommandLineParser parser = new DefaultParser();
+	private static Options options = null;
+	private static long startTime = System.currentTimeMillis();
 	
 	private static Options configParameters() {
 
