@@ -1,0 +1,6 @@
+-path "C:\EQX_Logs" -file "allibp.debug" -c
+-path "C:\EQX_Logs" -file "ibp.debug" -c
+-path "C:\EQX_Logs" -file "*.2*" -d
+-path "C:\Dev\EQX_Logs" -file "allibp.debug" -c
+-path "C:\Dev\EQX_Logs" -file "ibp.debug" -c
+-path "C:\Dev\EQX_Logs" -file "*.2*" -d

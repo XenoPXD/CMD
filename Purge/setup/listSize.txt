@@ -1,0 +1,7 @@
+-path "C:\EQX_Logs" -file "allibp.debug"
+-path "C:\EQX_Logs" -file "ibp.debug"
+-path "C:\EQX_Logs" -file "*.2*"
+-path "C:\Dev\EQX_Logs" -file "allibp.debug"
+-path "C:\Dev\EQX_Logs" -file "ibp.debug"
+-path "C:\Dev\EQX_Logs" -file "*.2*"
+-path "C:\Dev" -file "workspace_xpr*"
