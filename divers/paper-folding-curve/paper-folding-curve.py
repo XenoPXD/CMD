@@ -5,8 +5,15 @@ import argparse
 class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
     pass
 
-#order = int(input())
-#s, e = [int(i) for i in input().split()]
+# Pour compter le nombre de virage total
+def bin(order):
+    c=0
+    out=0
+    while c < order:
+        pas=pow(2, c)
+        out+=pas
+        c+=1
+    return out
 
 def path(order, s, e):
     start=s+1
@@ -68,5 +75,10 @@ parser.add_argument('-e', '--end', dest='e', metavar=('END'), nargs=1, type=int,
 
 # Parsing arguments
 args = parser.parse_args()
+nb=bin(args.order[0])
+if args.e[0]>nb:
+    args.e[0]=nb
+if args.s[0]<0:
+    args.s[0]=0
 #print(str(args.order) +" "+ str(args.s) +" "+ str(args.e))
 path(args.order[0], args.s[0], args.e[0])
