@@ -1,9 +1,37 @@
 import sys
 import math
 import argparse
+from time import sleep
 
 class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
     pass
+
+# Print iterations progress
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = 'X'):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    sys.stdout.write('\r%s |%s| %s%% %s \r' % (prefix, bar, percent, suffix))
+    sys.stdout.flush()
+    #print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
+
+  
+global compteurProgressBar
+compteurProgressBar=0
 
 # Pour compter le nombre de virage total
 def bin(order):
@@ -15,22 +43,33 @@ def bin(order):
         c+=1
     return out
 
-def path(order, s, e):
+def path(order, s, e, file):
     start=s+1
+    current=s+1
     end=e
     modulo=2
+    if (file!=""):
+        printProgressBar(0, end-start, prefix = 'Progress:', suffix = 'Complete  ', length = 50)
     while s <= e:
-        curve(order, start, end, modulo)
-        start+=1
+        curve(order, start, current, end, modulo, file)
+        current+=1
         s+=1
-    sys.stderr.write("\n")
+    #sys.stdout.write("\n")
     
-def curve(order, current, end, modulo):
+def curve(order, start, current, end, modulo, file):
+    global compteurProgressBar
     if current<=end+1:
         if (current % modulo):
-            sys.stdout.write(("0", "1")[int(math.ceil(current / modulo)) % 2])
+            value = ("0", "1")[int(math.ceil(current / modulo)) % 2]
+            if (file==""):
+                sys.stdout.write(value)
+                sys.stdout.flush()
+            else:
+                printProgressBar(compteurProgressBar-1, end-start, prefix = 'Progress:', suffix = 'Complete  ', length = 50)
+                compteurProgressBar+=1
+                file.write(value)     
         else:
-            curve(order-1, current, end, modulo*2)
+            curve(order-1, start, current, end, modulo*2, file)
 
 
 # Creating a parser
@@ -72,13 +111,40 @@ parser = argparse.ArgumentParser(description=t,
 parser.add_argument('-o', '--order', dest='order', nargs=1, type=int, help='An integer N for the order of the curve')
 parser.add_argument('-s', '--start', dest='s', metavar=('START'), nargs=1, type=int, help='A starting index')
 parser.add_argument('-e', '--end', dest='e', metavar=('END'), nargs=1, type=int, help='A ending index')
+parser.add_argument('-out', '--output', dest='output', metavar=('OUTPUT'), nargs=1, type=str, help='output file')
+parser.add_argument('-n', '--number', dest='number', action='store_true', help='return number curve')
 
 # Parsing arguments
 args = parser.parse_args()
 nb=bin(args.order[0])
-if args.e[0]>nb:
-    args.e[0]=nb
-if args.s[0]<0:
-    args.s[0]=0
+start=0
+end=0
+
+if (args.number):
+    print(nb)
+    exit()
+    
+if (args.e is None):
+    end = nb
+else:
+    if args.e[0]>nb:
+        end=nb
+    else:
+        end=args.e[0]
+        
+if (args.s is None):
+    start=0
+else:
+    if args.s[0]<0:
+        start=0
+    else:
+        start=args.s[0]
+
+file=""
+if  (args.output is None):
+    file=""
+else:
+    file = open(args.output[0], 'w+')
+
 #print(str(args.order) +" "+ str(args.s) +" "+ str(args.e))
-path(args.order[0], args.s[0], args.e[0])
+path(args.order[0], start, end, file)
