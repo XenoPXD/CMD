@@ -15,32 +15,32 @@ ofstream file;
 long compteurProgressBar = 0;
 clock_t tStart = clock();
 
-class InputParser{
-    public:
-        InputParser (int &argc, char **argv){
-            for (int i=1; i < argc; ++i)
-                this->tokens.push_back(std::string(argv[i]));
-        }
-        /// @author iain
-        const std::string& getCmdOption(const std::string &option) const{
-            std::vector<std::string>::const_iterator itr;
-            itr =  std::find(this->tokens.begin(), this->tokens.end(), option);
-            if (itr != this->tokens.end() && ++itr != this->tokens.end()){
-                return *itr;
-            }
-            static const std::string empty_string("");
-            return empty_string;
-        }
-        /// @author iain
-        bool cmdOptionExists(const std::string &option) const{
-            return std::find(this->tokens.begin(), this->tokens.end(), option)
-                   != this->tokens.end();
-        }
-    private:
-        std::vector <std::string> tokens;
+class InputParser {
+public:
+	InputParser(int &argc, char **argv) {
+		for (int i = 1; i < argc; ++i)
+			this->tokens.push_back(std::string(argv[i]));
+	}
+	/// @author iain
+	const std::string& getCmdOption(const std::string &option) const {
+		std::vector<std::string>::const_iterator itr;
+		itr = std::find(this->tokens.begin(), this->tokens.end(), option);
+		if (itr != this->tokens.end() && ++itr != this->tokens.end()) {
+			return *itr;
+		}
+		static const std::string empty_string("");
+		return empty_string;
+	}
+	/// @author iain
+	bool cmdOptionExists(const std::string &option) const {
+		return std::find(this->tokens.begin(), this->tokens.end(), option)
+				!= this->tokens.end();
+	}
+private:
+	std::vector<std::string> tokens;
 };
 
-void help() {
+int help() {
     cout << "usage: ./paper-folding-curve [-h] -o ORDER [-s START] [-e END]" << endl;
     cout << "                             [-out OUTPUT] [-n NUMBER]" << endl;
     cout << endl;
@@ -67,7 +67,6 @@ void help() {
     cout << "Fold it the third time into half, in the same direction."  << endl;
     cout << "Then open it, so that every fold is at a right angle."  << endl;
     cout << "Viewing it from the edge you could see a pattern like this:"  << endl;
-    //cout << endl;
     cout << "   _"  << endl;
     cout << "|_| |_"  << endl;
     cout << "     _|"  << endl;
@@ -86,110 +85,116 @@ void help() {
     cout << "100111001000"  << endl;
     cout << "10001100100111011001110010011101100011001001110110011100100011011000110010011101100111001001110110001"  << endl;
     cout << endl;
-    exit(EXIT_SUCCESS);
+	return EXIT_SUCCESS;
 }
 
 long bin(int order) {
-    long c=0;
-    long out=0;
-    while(c < order) {
-      out+=pow(2, c);
-      c+=1;
-    }
-    return out;
+	long c = 0;
+	long out = 0;
+	while (c < order) {
+		out += pow(2, c);
+		c += 1;
+	}
+	return out;
 }
 
 void curve(int order, long start, long current, long end, long modulo) {
-    if (current<=end+1) {
-        if (current % modulo) {
-          compteurProgressBar++;
-          string value = "1";
-          if (long(ceil(current / modulo)) % 2) {
-            value = "0";
-          }
-          if (file.is_open()) {
-            file << value;
-          } else {
-            cout << value;
-          }
-        } else {
-           curve(order-1, start, current, end, modulo*2);
-        }
-    }
+	if (current <= end + 1) {
+		if (current % modulo) {
+			compteurProgressBar++;
+			string value = "1";
+			if (long(ceil(current / modulo)) % 2) {
+				value = "0";
+			}
+			if (file.is_open()) {
+				file << value;
+			} else {
+				cout << value;
+			}
+		} else {
+			curve(order - 1, start, current, end, modulo * 2);
+		}
+	}
 }
 
 void path(int order, long s, long e) {
-    long start=s+1;
-    long current=s+1;
-    long end=e;
-    long modulo=2;
-    if (file.is_open()) {
-      cout << (end-start)+1;
-      cout << " curves in progress..." << endl;
-    }
-    while(s <= e) {
-      curve(order, start, current, end, modulo);
-      current+=1;
-      s+=1;
-    }
-    if(!file.is_open()) cout << endl;
+	long start = s + 1;
+	long current = s + 1;
+	long end = e;
+	long modulo = 2;
+	if (file.is_open()) {
+		cout << (end - start) + 1;
+		cout << " curves in progress..." << endl;
+	}
+	while (s <= e) {
+		curve(order, start, current, end, modulo);
+		current += 1;
+		s += 1;
+	}
+	if (!file.is_open())
+		cout << endl;
 }
 
 int main(int argc, char* argv[]) {
 
-    InputParser input(argc, argv);
+	InputParser input(argc, argv);
 
-    string temp;
-    
-    int order;
-    long nb;
+	string temp;
+	bool tempExist;
 
-    if(input.cmdOptionExists("-h")
-        || input.cmdOptionExists("--help")){
-        help();
-    }
+	int order;
+	long nb;
 
-    string strO = input.getCmdOption("-o");
-    string strOrder = input.getCmdOption("--order");
-    string strFinalOrder;
-    if (strO != "") {
-      strFinalOrder = strO;
-    } else if (strOrder != "") {
-      strFinalOrder = strOrder;
-    } else {
-      help();
-    }
-    if(sscanf(strFinalOrder.c_str(), "%d", &order) != 1){}
-    nb = bin(order);
+	if (input.cmdOptionExists("-h") || input.cmdOptionExists("--help")) {
+		return help();
+	}
 
-    if(input.cmdOptionExists("-n")
-        || input.cmdOptionExists("--number")){
-        cout << nb << endl;
-        exit(EXIT_SUCCESS);
-    }
+	string strO = input.getCmdOption("-o");
+	string strOrder = input.getCmdOption("--order");
+	string strFinalOrder;
+	if (strO != "") {
+		strFinalOrder = strO;
+	} else if (strOrder != "") {
+		strFinalOrder = strOrder;
+	} else {
+		return help();
+	}
+	if (sscanf(strFinalOrder.c_str(), "%d", &order) != 1) {
+	}
+	nb = bin(order);
 
-    long start = 0;
-    long end = nb;
+	if (input.cmdOptionExists("-n") || input.cmdOptionExists("--number")) {
+		cout << nb << endl;
+		return EXIT_SUCCESS;
+	}
 
-    string strStart = input.getCmdOption("--start");
-    if(sscanf(strStart.c_str(), "%ld", &start) != 1){}
-    if (start<0) start=0;
+	long start = 0;
+	long end = nb;
 
-    string strEnd = input.getCmdOption("--end");
-    if(sscanf(strEnd.c_str(), "%ld", &end) != 1){}
-    if (end>nb) end=nb;
+	string strStart = input.getCmdOption("--start");
+	if (sscanf(strStart.c_str(), "%ld", &start) != 1) {
+	}
+	if (start < 0)
+		start = 0;
 
-    string fileName = input.getCmdOption("--output");
-    if (fileName != "") {
-        file.open (fileName.c_str());
-    }
+	string strEnd = input.getCmdOption("--end");
+	if (sscanf(strEnd.c_str(), "%ld", &end) != 1) {
+	}
+	if (end > nb)
+		end = nb;
 
-    path(order, start, end);
+	string fileName = input.getCmdOption("--output");
+	if (fileName != "") {
+		file.open(fileName.c_str());
+	}
 
-    if(file.is_open()) {
-      file.close();
-      printf("Time taken: %.3fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
-    }
+	path(order, start, end);
 
-    return EXIT_SUCCESS;
+	if (file.is_open()) {
+		file.close();
+		printf("Time taken: %.3fs\n",
+				(double) (clock() - tStart) / CLOCKS_PER_SEC);
+	}
+
+	return EXIT_SUCCESS;
 }
