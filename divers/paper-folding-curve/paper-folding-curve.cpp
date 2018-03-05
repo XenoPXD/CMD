@@ -140,7 +140,6 @@ int main(int argc, char* argv[]) {
 	InputParser input(argc, argv);
 
 	string temp;
-	bool tempExist;
 
 	int order;
 	long nb;
