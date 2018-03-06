@@ -5,6 +5,9 @@
 #include <fstream>
 #include <time.h>
 
+#include <sstream>
+
+
 using namespace std;
 
 // g++ -std=c++11 paper-folding-curve.cpp -o paper-folding-curve
@@ -21,6 +24,18 @@ public:
 		for (int i = 1; i < argc; ++i)
 			this->tokens.push_back(std::string(argv[i]));
 	}
+	const std::string& getCmdOptions(const std::string &options) const {
+		istringstream iss(options);
+		do {
+			string subs;
+			iss >> subs;
+			if (getCmdOption(subs) != "") {
+				return getCmdOption(subs);
+			}
+		} while (iss);
+		static const std::string empty_string("");
+		return empty_string;
+	}
 	/// @author iain
 	const std::string& getCmdOption(const std::string &option) const {
 		std::vector<std::string>::const_iterator itr;
@@ -30,6 +45,18 @@ public:
 		}
 		static const std::string empty_string("");
 		return empty_string;
+	}
+	bool cmdOptionsExists(const std::string &options) const {
+		istringstream iss(options);
+		do {
+			string subs;
+			iss >> subs;
+			if (cmdOptionExists(subs)) {
+				return true;
+			}
+			//cout << "Substring: " << subs << endl;
+		} while (iss);
+		return false;
 	}
 	/// @author iain
 	bool cmdOptionExists(const std::string &option) const {
@@ -138,6 +165,12 @@ void path(int order, long s, long e) {
 int main(int argc, char* argv[]) {
 
 	InputParser input(argc, argv);
+	/*
+	bool isExist = false;
+	isExist = input.cmdOptionsExists("-o --order");
+	cout << isExist << endl;
+	return 0;
+	*/
 
 	string temp;
 
@@ -148,21 +181,14 @@ int main(int argc, char* argv[]) {
 		return help();
 	}
 
-	string strO = input.getCmdOption("-o");
-	string strOrder = input.getCmdOption("--order");
-	string strFinalOrder;
-	if (strO != "") {
-		strFinalOrder = strO;
-	} else if (strOrder != "") {
-		strFinalOrder = strOrder;
-	} else {
-		return help();
+	string strOrder = input.getCmdOptions("-o --order");
+	if (strOrder == "") {
+		help();
 	}
-	if (sscanf(strFinalOrder.c_str(), "%d", &order) != 1) {
-	}
+	if (sscanf(strOrder.c_str(), "%d", &order) != 1) {	}
 	nb = bin(order);
 
-	if (input.cmdOptionExists("-n") || input.cmdOptionExists("--number")) {
+	if (input.cmdOptionsExists("-n --number")) {
 		cout << nb << endl;
 		return EXIT_SUCCESS;
 	}
@@ -170,19 +196,19 @@ int main(int argc, char* argv[]) {
 	long start = 0;
 	long end = nb;
 
-	string strStart = input.getCmdOption("--start");
+	string strStart = input.getCmdOptions("-s --start");
 	if (sscanf(strStart.c_str(), "%ld", &start) != 1) {
 	}
 	if (start < 0)
 		start = 0;
 
-	string strEnd = input.getCmdOption("--end");
+	string strEnd = input.getCmdOptions("-e --end");
 	if (sscanf(strEnd.c_str(), "%ld", &end) != 1) {
 	}
 	if (end > nb)
 		end = nb;
 
-	string fileName = input.getCmdOption("--output");
+	string fileName = input.getCmdOptions("-O --output");
 	if (fileName != "") {
 		file.open(fileName.c_str());
 	}
@@ -197,3 +223,4 @@ int main(int argc, char* argv[]) {
 
 	return EXIT_SUCCESS;
 }
+
