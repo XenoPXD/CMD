@@ -198,10 +198,6 @@ int main(int argc, char* argv[]) {
 	string strEnd = input.getCmdOptions("-e --end");
 	if (sscanf(strEnd.c_str(), "%ld", &end) != 1) {}
 	if (end >= nb) end = nb-1;
-//	if ("" == strEnd) {
-//		end = nb-1;
-//	}
-//	end--;
 
 	string fileName = input.getCmdOptions("-O --output");
 	if (fileName != "") {
