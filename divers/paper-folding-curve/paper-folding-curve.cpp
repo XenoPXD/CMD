@@ -165,12 +165,6 @@ void path(int order, long s, long e) {
 int main(int argc, char* argv[]) {
 
 	InputParser input(argc, argv);
-	/*
-	bool isExist = false;
-	isExist = input.cmdOptionsExists("-o --order");
-	cout << isExist << endl;
-	return 0;
-	*/
 
 	string temp;
 
@@ -197,16 +191,17 @@ int main(int argc, char* argv[]) {
 	long end = nb;
 
 	string strStart = input.getCmdOptions("-s --start");
-	if (sscanf(strStart.c_str(), "%ld", &start) != 1) {
-	}
+	if (sscanf(strStart.c_str(), "%ld", &start) != 1) {}
 	if (start < 0)
 		start = 0;
 
 	string strEnd = input.getCmdOptions("-e --end");
-	if (sscanf(strEnd.c_str(), "%ld", &end) != 1) {
-	}
-	if (end > nb)
-		end = nb;
+	if (sscanf(strEnd.c_str(), "%ld", &end) != 1) {}
+	if (end >= nb) end = nb-1;
+//	if ("" == strEnd) {
+//		end = nb-1;
+//	}
+//	end--;
 
 	string fileName = input.getCmdOptions("-O --output");
 	if (fileName != "") {
@@ -223,4 +218,3 @@ int main(int argc, char* argv[]) {
 
 	return EXIT_SUCCESS;
 }
-
